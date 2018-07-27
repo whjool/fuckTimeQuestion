@@ -21,7 +21,6 @@
 {
     [NSTimeZone timeZoneForSecondsFromGMT:3600*8];
     NSDateFormatter *dateFormat= [[NSDateFormatter alloc] init];
-    [dateFormat setLocale:[NSLocale systemLocale]];
     [dateFormat setDateFormat:format];
     dateFormat.lenient = YES;
     return dateFormat;
@@ -32,20 +31,33 @@
     if (birthDateStr.length>0)
     {
         NSDateFormatter *formatter =[self shareDateFormatter:@"yyyy-MM-dd"];
-        [formatter setDateStyle:NSDateFormatterFullStyle];
+        
         NSDate *birthDate = [formatter dateFromString:birthDateStr];
         
-        //获取今天当前时间! 看看是不是18岁!
-        NSString *currentDateStr = [formatter stringFromDate:[NSDate date]];
-        NSDate *currentDate = [formatter dateFromString:currentDateStr];
-        NSTimeInterval time=[currentDate timeIntervalSinceDate:birthDate];
-        int age = ((int)time)/(3600*24*365);
-        if (age>=18) {
+        NSInteger age = [self getDiffYear_dateWithBegin:birthDate andEnd:[NSDate date]];
+        if (age>=18)
+        {
             return YES;
         }
     }
     
     return NO;
+}
+
++(NSInteger)getDiffYear_dateWithBegin:(NSDate *)beginDate andEnd:(NSDate *)endDate
+{
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDateComponents * components =  [calendar components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:beginDate toDate:endDate options:NSCalendarWrapComponents];
+    NSLog(@"year:%ld,month:%ld,day:%ld",components.year,components.month,components.day);
+    return components.year;
+}
+
++(NSInteger)get_DateYear:(NSDate *)date
+{
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    unsigned unitFlag = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay;
+    NSDateComponents *comp1 = [calendar components:unitFlag fromDate:date];
+    return comp1.year;
 }
 
 
